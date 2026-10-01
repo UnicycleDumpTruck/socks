@@ -6,16 +6,16 @@ from rich.table import Table
 
 # Job contains serial, instrument, ball_count, balls[4], attr_count, attrs[4], seconds_done, status
 # TODO: Have robot send full job as text, parse in python and print.
-
+# '1,1,4,1,1,1,1,0,0,0,0,0,0,queued'
 table = Table(title="Robot Job Status")
 table.add_column("Queued", justify="left", style="cyan", no_wrap=False)
 table.add_column("Delivering", justify="left", style="magenta", no_wrap=False)
 table.add_column("Processing", justify="left", style="blue", no_wrap=False)
 table.add_column("Done", justify="left", style="green", no_wrap=False)
-queued_table = Table()
-delivering_table = Table()
-processing_table = Table()
-done_table = Table()
+queued_table = Table(show_header=False, box=None)
+delivering_table = Table(show_header=False, box=None)
+processing_table = Table(show_header=False, box=None)
+done_table = Table(show_header=False, box=None)
 table.add_row(queued_table, delivering_table, processing_table, done_table)
 
 console = Console()
@@ -52,7 +52,9 @@ def handle_client(conn, addr):
                 break
             conn.sendall(data) #echo the received data back to the clent
             with lock:
+                data = data.decode("utf-8")
                 message_log.append(data)
+                queued_jobs[data.split(',')[0]] = data
                 pprint.pp(message_log)
                 print_table()
     except (ConnectionResetError, BrokenPipeError) as e:
