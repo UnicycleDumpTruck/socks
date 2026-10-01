@@ -1,10 +1,45 @@
 import socket
 import threading
 import pprint
+from rich.console import Console
+from rich.table import Table
+
+# Job contains serial, instrument, ball_count, balls[4], attr_count, attrs[4], seconds_done, status
+# TODO: Have robot send full job as text, parse in python and print.
+
+table = Table(title="Robot Job Status")
+table.add_column("Queued", justify="left", style="cyan", no_wrap=False)
+table.add_column("Delivering", justify="left", style="magenta", no_wrap=False)
+table.add_column("Processing", justify="left", style="blue", no_wrap=False)
+table.add_column("Done", justify="left", style="green", no_wrap=False)
+queued_table = Table()
+delivering_table = Table()
+processing_table = Table()
+done_table = Table()
+table.add_row(queued_table, delivering_table, processing_table, done_table)
+
+console = Console()
 
 client_list = []
 lock = threading.Lock()
 message_log = []
+
+queued_jobs = {}
+delivering_job = ""
+processing_jobs = {}
+done_jobs = {}
+
+
+def print_table():
+    for job in queued_jobs:
+        queued_table.add_row(job)
+    delivering_table.add_row(delivering_job)
+    for job in processing_jobs:
+        processing_table.add_row(job)
+    for job in done_jobs:
+        done_table.add_row(job)
+    console.print(table)
+    
 
 def handle_client(conn, addr):
     with lock:
@@ -19,6 +54,7 @@ def handle_client(conn, addr):
             with lock:
                 message_log.append(data)
                 pprint.pp(message_log)
+                print_table()
     except (ConnectionResetError, BrokenPipeError) as e:
         print (f"Connection error with {addr}: {e}")
     finally:
