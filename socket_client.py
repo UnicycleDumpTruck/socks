@@ -1,7 +1,8 @@
 import socket
 
 def client_program():
-    host = '192.168.125.203' # loopback address for testing
+    # host = '192.168.125.203' # loopback address for testing
+    host = '127.0.0.1' # loopback address for testing
     port = 65432
 
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM) # IPv4 TCP socket
