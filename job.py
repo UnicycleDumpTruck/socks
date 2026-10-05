@@ -20,5 +20,5 @@ class Job:
     def str(self):
         return self.__str__()
     def __str__(self):
-        return f"{self.serial} {self.status} {self.seconds_done} Balls: {self.ball_1}{self.ball_2}{self.ball_3}{self.ball_4} Attrs: {self.attr_1}{self.attr_2}{self.attr_3}{self.attr_4}"
+        return f"S:{self.serial} I:{self.instrument} {self.status} {self.seconds_done}s B:{self.ball_1}{self.ball_2}{self.ball_3}{self.ball_4} A:{self.attr_1}{self.attr_2}{self.attr_3}{self.attr_4}"
     
