@@ -1,3 +1,11 @@
+from rich.emoji import Emoji
+
+instrument_names = {'1':'Formulator', '2':'Agitator', '3':'Compressor'}
+
+attribute_names = [{},{},{}]
+
+ball_emoji = {'1':"G", '2':"B", '3':"S"}
+
 class Job:
 
     def __init__(self, input_string):
@@ -20,5 +28,5 @@ class Job:
     def str(self):
         return self.__str__()
     def __str__(self):
-        return f"S:{self.serial} I:{self.instrument} {self.status} {self.seconds_done}s B:{self.ball_1}{self.ball_2}{self.ball_3}{self.ball_4} A:{self.attr_1}{self.attr_2}{self.attr_3}{self.attr_4}"
+        return f"Job:{self.serial} {instrument_names[self.instrument]} {self.status} {self.seconds_done}s Balls:{ball_emoji[self.ball_1]}{ball_emoji[self.ball_2]}{ball_emoji[self.ball_3]}{ball_emoji[self.ball_4]} A:{self.attr_1}{self.attr_2}{self.attr_3}{self.attr_4}"
     
