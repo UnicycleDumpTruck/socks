@@ -123,7 +123,8 @@ def handle_client(conn, addr):
 
 
 def server_program():
-    host = '192.168.125.203' # Loopback address for local testing
+    host = '192.168.125.202' # Loopback address for local testing
+    #host = '' # Loopback address for local testing
     #host = '127.0.0.1' # Loopback address for local testing
     port = 65432
 

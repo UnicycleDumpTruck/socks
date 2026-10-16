@@ -4,7 +4,7 @@ instrument_names = {'1':'Formulator', '2':'Agitator', '3':'Compressor'}
 
 attribute_names = [{},{},{}]
 
-ball_emoji = {'1':"G", '2':"B", '3':"S"}
+ball_emoji = {'0':"ER", '1':"G", '2':"B", '3':"S", '4':"L", '5':"R"}
 
 class Job:
 
