@@ -1,0 +1,19 @@
+<html>
+  <head>
+    <script>
+    addEventListener('DOMContentLoaded', function() {
+        const socket = new WebSocket('ws://localhost:5000/websocket');
+        socket.addEventListener('message', function (event) {
+            socket.close();
+            window.location.reload();
+        });
+    });
+    </script>
+    <title>System Status</title>
+  </head>
+  <body>
+    <h1>Interesting stuff to follow</h1>
+    body text here
+  </body>
+
+  </html>
