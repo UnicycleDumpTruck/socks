@@ -1,3 +1,6 @@
+#!/usr/bin/python3
+
+import random
 import datetime as dt
 import socket
 import threading
@@ -28,6 +31,7 @@ def print_table():
     global delivering_job
     global processing_jobs
     global done_jobs
+
     table = Table(f"Robot Job Status at {dt.datetime.now().strftime("%H:%M:%S %f")}")
 
     queued_table = Table("Queued", show_header=True, style="magenta")#, box=None)
@@ -55,6 +59,7 @@ def print_table():
     for job in processing_jobs.items():
         print(f"adding to proc: {job[1].str()}")
         processing_table.add_row(job[1].str())
+        add_job(job[1].str())
     processing_table.add_row("")
     for job in done_jobs.items():
         print(f"adding to done: {job[1].str()}")
@@ -62,6 +67,8 @@ def print_table():
     done_table.add_row("")
     console.clear()
     print("\n\n")
+    print(processing_jobs.values())
+    print(jobs)
     console.print(table)
     console.bell()
 
@@ -116,6 +123,7 @@ def handle_client(conn, addr):
                     print(f"Removed from processing to add to done: {processing_jobs.pop(rx_job.serial)}")
                     done_jobs[rx_job.serial] = rx_job
                 print_table()
+                #add_job()
     except (ConnectionResetError, BrokenPipeError) as e:
         print (f"Connection error with {addr}: {e}")
     finally:
@@ -128,7 +136,6 @@ def server_program():
     #host = '127.0.0.1' # Loopback address for local testing
     port = 65432
 
-    ui.add_body_html('''<div>Is it working yet?</div>''')
     
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM) # IPV4 TCP Socket
     server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1) # allow port reuse
@@ -147,16 +154,29 @@ def server_program():
     finally:
         server_socket.close()
 
-#print("Passed ui.run()")
+jobs = []
 
-#server_program()
+@ui.refreshable
+def jobs_ui() -> None:
+    global processing_jobs
+    global jobs
+    ui.html('Processing Jobs: ' + '\n'.join(n for n in processing_jobs.values()))
+    ui.label('Number jobs:' + ', '.join(str(n) for n in jobs))
+    ui.label().bind_text_from(globals(), 'jobs')
+    ui.label().bind_text_from(globals(), 'processing_jobs')
 
-#if __name__ == ['__main__', '__mp_main__']:
-#if __name__ == '__mp_main__':
+def add_job(j="default text") -> None:
+    jobs.append(j)
+    jobs_ui.refresh()
+
+#jobs_ui()
+#ui.button('Add job', on_click=add_job)
+
+
 if __name__ == '__mp_main__':
- 
     socket_server_thread = threading.Thread(target=server_program, daemon=False)
     socket_server_thread.start()
-
-    #server_program()
-ui.run(show=False)
+jobs_ui()
+ui.button('Add a job', on_click=add_job)
+ui.label().bind_text_from(globals(), 'jobs')
+ui.run(show=False, title='ABBy Status')
