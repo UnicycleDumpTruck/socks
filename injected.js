@@ -56,10 +56,11 @@
     };
 
     // onerror is always followed by onclose; reconnect logic lives there only.
-    ws.onclose = () => {
+    ws.onclose = (e) => {
       ws = null;
       if (unloading) return;
       scheduleReconnect();
+      console.log("closed", e.code, e.reason, "clean:", e.wasclean);
     };
   }
 

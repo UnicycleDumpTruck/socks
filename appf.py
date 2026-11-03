@@ -2,6 +2,7 @@ from http.server import HTTPServer, SimpleHTTPRequestHandler
 import os
 import sys
 import webbrowser
+from pathlib import Path
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 import asyncio
@@ -11,6 +12,12 @@ import threading
 port = 8000
 clients = set()
 
+JS_PATH = Path(__file__).resolve().parent / "injected.js"
+
+try:
+    LIVERELOAD_JS = JS_PATH.read_text(encoding="utf-8")
+except FileNotFoundError:
+    raise SystemExit(f"Missing {JS_PATH} - livereload would silently do nothing")
 
 async def webocket_handler(websocket):
     print("client connected")
@@ -39,15 +46,16 @@ class LiveReloadHandler(SimpleHTTPRequestHandler):
         if path.endswith(".html") and os.path.isfile(path):
             with open(path, "r", encoding="utf-8") as f:
                 content = f.read()
-            inject = """
-            <script>
-              const ws = new WebSocket("ws://localhost:5678");
-              ws.onmessage = (e) => {
-                if (e.data === "reload") location.reload();
-              };
-            </script>
-            """
-            content = content.replace("</body>", inject + "</body>")
+
+#            inject = """
+#            <script>
+#              const ws = new WebSocket("ws://localhost:5678");
+#              ws.onmessage = (e) => {
+#                if (e.data === "reload") location.reload();
+#              };
+#            </script>
+#            """
+            content = content.replace("</body>", LIVERELOAD_JS + "</body>")
             encoded = content.encode("utf-8")
             self.send_response(200)
             self.send_header("Content-Type", "text/html")
@@ -98,7 +106,7 @@ async def start_server(directory, name):
         httpd = HTTPServer(("localhost", port), LiveReloadHandler)
         url = f"http://localhost:{port}/{name}"
         print(f"Starting server in {directory} : {url}")
-        webbrowser.open(url)
+#        webbrowser.open(url)
         httpd.serve_forever()
 
     threading.Thread(target=run_http_server, daemon=True).start()
