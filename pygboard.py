@@ -40,9 +40,6 @@ def on_draw():
     window.clear()
     label.draw()
 
-pyglet.app.run()
-
-
 
 console = Console()
 
@@ -54,10 +51,10 @@ queued_jobs = {}
 delivering_job = None
 processing_jobs = {}
 done_jobs = {}
-queued_jobs_lock = Threading.Lock()
-delivering_job_lock = Threading.Lock()
-processing_jobs_lock = Threading.Lock()
-done_jobs_lock = Threading.Lock()
+queued_jobs_lock = threading.Lock()
+delivering_job_lock = threading.Lock()
+processing_jobs_lock = threading.Lock()
+done_jobs_lock = threading.Lock()
 
 def print_table():
     global queued_jobs
@@ -92,7 +89,6 @@ def print_table():
     for job in processing_jobs.items():
         print(f"adding to proc: {job[1].str()}")
         processing_table.add_row(job[1].str())
-        add_job(job[1].str())
     processing_table.add_row("")
     for job in done_jobs.items():
         print(f"adding to done: {job[1].str()}")
@@ -204,7 +200,7 @@ def server_program():
     finally:
         server_socket.close()
 
-if __name__ == '__mp_main__':
-  socket_server_thread = threading.Thread(target=server_program, daemon=False)
-  socket_server_thread.start()
-  pyglet.app.run()
+#if __name__ == '__main__':
+socket_server_thread = threading.Thread(target=server_program, daemon=False)
+socket_server_thread.start()
+pyglet.app.run()
