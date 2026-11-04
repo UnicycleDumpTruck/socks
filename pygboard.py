@@ -27,18 +27,67 @@ config.opengl_api = "gles"
 config.major_version = 3
 config.minor_version = 1
 
-window = pyglet.window.Window(config=config)
+H1_LABEL_X = 100
+JOB_ICON_X = 120
+JOB_ICON_Z = 1
+JOB_ICON_HEIGHT = 100
+JOB_ICON_WIDTH = 100
+H1_LABEL_HEIGHT = 40
+Q_BLOCK_TOP_Y = 100
+D_BLOCK_TOP_Y = 400
+P_BLOCK_TOP_Y = 800
+D_BLOCK_TOP_Y = 900
+
+agitator_icon = pyglet.image.load('Robot_Icons_Agitator')
+formulator_icon = pyglet.image.load('Robot_Icons_Formulator')
+compressor_icon = pyglet.image.load('Robot_Icons_Compressor')
+instrument_icons = {1:formulator_icon, 2:agitator_icon, 3:compressor_icon}
+
+class RobotStatusWindow(pyglet.window.Window):
+  def __init__(self):
+    super().__init__()
+    self.queued_label = pyglet.text.Label('Queued Jobs', x=H1_LABEL_X, y=Q_BLOCK_TOP_Y)
+    self.delivering_label = pyglet.text.Label('Delivering Job', x=H1_LABEL_X, y=D_BLOCK_TOP_Y)
+    self.processing_label = pyglet.text.Label('Processing Jobs', x=H1_LABEL_X, y=P_BLOCK_TOP_Y)
+    self.done_label = pyglet.text.Label('Done Jobs', x=H1_LABEL_X, y=D_BLOCK_TOP_Y)
+    self.labels = [self.queued_label, self.delivering_label, self.processing_label, self.done_label, self.done_label]
+  def on_draw(self):
+    self.clear()
+    for lbl in self.labels:
+      lbl.draw()
+    with queued_jobs_lock:
+      for i, job in enumerate(queued_jobs.items()):
+        instrument_icons[job[1].instrument].blit(JOB_ICON_X, (Q_BLOCK_TOP_Y + H1_LABEL_HEIGHT + (i * JOB_ICON_HEIGHT)), JOB_ICON_Z)
+        print(f"adding to queued: {job[1].str()}")
+    with delivering_job_lock:
+      if delivering_job:
+          print(f"adding to delivering: {delivering_job.str()}")
+    with processing_jobs_lock:
+      for i, job in enumerate(processing_jobs.items()):
+          print(f"adding to proc: {job[1].str()}")
+    with done_jobs_lock:
+      for i, job in enumerate(done_jobs.items()):
+          print(f"adding to done: {job[1].str()}")
+
+
+
+
+main_window = pyglet.window.Window(config=config)
 
 label = pyglet.text.Label('Hello world',
                           font_name='Times New Roman',
                           font_size=36,
-                          x=window.width//2, y=window.height//2,
+                          x=main_window.width//2, y=main_window.height//2,
                           anchor_x='center', anchor_y='center')
 
-@window.event
-def on_draw():
-    window.clear()
-    label.draw()
+#@main_window.event
+#def on_draw():
+#    main_window.clear()
+#    label.draw()
+
+
+
+
 
 
 console = Console()
