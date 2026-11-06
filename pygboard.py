@@ -29,28 +29,29 @@ config.minor_version = 1
 
 H1_LABEL_X = 100
 JOB_ICON_X = 120
-JOB_ICON_Z = 1
+JOB_ICON_Z = 0
 JOB_ICON_HEIGHT = 100
 JOB_ICON_WIDTH = 100
 H1_LABEL_HEIGHT = 40
-Q_BLOCK_TOP_Y = 100
-D_BLOCK_TOP_Y = 400
-P_BLOCK_TOP_Y = 800
-D_BLOCK_TOP_Y = 900
+Q_BLOCK_TOP_Y = 1800
+R_BLOCK_TOP_Y = 1000
+P_BLOCK_TOP_Y = 900
+D_BLOCK_TOP_Y = 700
 
-agitator_icon = pyglet.image.load('Robot_Icons_Agitator')
-formulator_icon = pyglet.image.load('Robot_Icons_Formulator')
-compressor_icon = pyglet.image.load('Robot_Icons_Compressor')
+agitator_icon = pyglet.image.load('Robot_Icons_Agitator.png')
+formulator_icon = pyglet.image.load('Robot_Icons_Formulator.png')
+compressor_icon = pyglet.image.load('Robot_Icons_Compressor.png')
 instrument_icons = {1:formulator_icon, 2:agitator_icon, 3:compressor_icon}
 
 class RobotStatusWindow(pyglet.window.Window):
-  def __init__(self):
-    super().__init__()
+  def __init__(self, **kwargs):
+    super().__init__(**kwargs)
     self.queued_label = pyglet.text.Label('Queued Jobs', x=H1_LABEL_X, y=Q_BLOCK_TOP_Y)
-    self.delivering_label = pyglet.text.Label('Delivering Job', x=H1_LABEL_X, y=D_BLOCK_TOP_Y)
+    self.delivering_label = pyglet.text.Label('Delivering Job', x=H1_LABEL_X, y=R_BLOCK_TOP_Y)
     self.processing_label = pyglet.text.Label('Processing Jobs', x=H1_LABEL_X, y=P_BLOCK_TOP_Y)
     self.done_label = pyglet.text.Label('Done Jobs', x=H1_LABEL_X, y=D_BLOCK_TOP_Y)
     self.labels = [self.queued_label, self.delivering_label, self.processing_label, self.done_label, self.done_label]
+    print('Main status window init complete')
   def on_draw(self):
     self.clear()
     for lbl in self.labels:
@@ -72,7 +73,7 @@ class RobotStatusWindow(pyglet.window.Window):
 
 
 
-main_window = pyglet.window.Window(config=config)
+main_window = RobotStatusWindow(config=config, caption="Robot Status", width=1080, height=1920)
 
 label = pyglet.text.Label('Hello world',
                           font_name='Times New Roman',
