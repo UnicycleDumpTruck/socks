@@ -32,16 +32,17 @@ JOB_ICON_X = 120
 JOB_ICON_Z = 0
 JOB_ICON_HEIGHT = 100
 JOB_ICON_WIDTH = 100
+JOB_V_SPACE = 20
 H1_LABEL_HEIGHT = 40
 Q_BLOCK_TOP_Y = 1800
 R_BLOCK_TOP_Y = 1000
 P_BLOCK_TOP_Y = 900
 D_BLOCK_TOP_Y = 700
 
-agitator_icon = pyglet.image.load('Robot_Icons_Agitator.png')
-formulator_icon = pyglet.image.load('Robot_Icons_Formulator.png')
-compressor_icon = pyglet.image.load('Robot_Icons_Compressor.png')
-instrument_icons = {1:formulator_icon, 2:agitator_icon, 3:compressor_icon}
+agitator_icon = pyglet.image.load('agi_100.png')
+formulator_icon = pyglet.image.load('for_100.png')
+compressor_icon = pyglet.image.load('com_100.png')
+instrument_icons = {'1':formulator_icon, '2':agitator_icon, '3':compressor_icon}
 
 queued_job_sprites = []
 delivering_job_sprites = []
@@ -66,8 +67,11 @@ class RobotStatusWindow(pyglet.window.Window):
       for i, job in enumerate(queued_jobs.items()):
         queued_job_sprites.append(
           pyglet.sprite.Sprite(img=instrument_icons[job[1].instrument], 
-                              JOB_ICON_X, (Q_BLOCK_TOP_Y + H1_LABEL_HEIGHT + (i * JOB_ICON_HEIGHT)),
-                              batch=job_icon_sprite_batch)
+                              x=JOB_ICON_X, 
+                              y=(Q_BLOCK_TOP_Y - H1_LABEL_HEIGHT - (i * (JOB_ICON_HEIGHT + JOB_V_SPACE))),
+                              #width=JOB_ICON_WIDTH,
+                              #HEIGHT=JOB_ICON_HEIGHT,
+                              batch=job_icon_sprite_batch))
         print(f"adding to queued: {job[1].str()}")
     with delivering_job_lock:
       if delivering_job:
