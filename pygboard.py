@@ -26,10 +26,10 @@ config = screen.get_best_config()
 config.opengl_api = "gles"
 config.major_version = 3
 config.minor_version = 1
-#config.fullscreen = True
 
 H1_LABEL_X = 100
 #JOB_ICON_X = 120
+JOB_COLUMN_WIDTH = 300
 JOB_FONT_SIZE = 32 # 24px high
 JOB_ICON_Z = 0
 JOB_ICON_HEIGHT = 100
@@ -52,6 +52,10 @@ delivering_job_sprite = None
 processing_job_sprites = []
 done_job_sprites = []
 #job_icon_sprite_batch = pyglet.graphics.Batch()
+
+def list_to_col(lst, column_length):
+  # Split a list of jobs into columns for display
+  return [lst[i:i + column_length] for i in range(0, len(lst), column_length)]
 
 class StatusSectionBackground():
   def __init__(self, x, y, width, height, label_text, color): # color should be RGB tuple like (55, 55, 255)
@@ -109,20 +113,20 @@ class RobotStatusWindow(pyglet.window.Window):
     self.job_text_labels_batch = pyglet.graphics.Batch()
     
     with queued_jobs_lock:
-      for i, job in enumerate(queued_jobs.items(), start=1):
-        self.queued_job_sprites.append(
-          pyglet.sprite.Sprite(img=instrument_icons[job[1].instrument], 
-                              x=40, 
-                              y=(self.queued_section.sprite_box_top - (i * (JOB_V_SPACE))),
-                              #anchor_x=0,
-                              #anchor_y=JOB_ICON_HEIGHT,
-                              batch=self.job_icon_sprite_batch))
-        self.job_text_labels.append(pyglet.text.Label(job[1].serial, font_name='Impact',
-                                   font_size=JOB_FONT_SIZE, 
-                                   x=100 + 40 + 20, 
-                                   y=(self.queued_section.sprite_box_top - (i * (JOB_V_SPACE))),
-                                   color=(0,0,0),
-                                   batch=self.job_text_labels_batch))
+      queued_columns = list_to_col(queued_jobs.items(), 3)
+      for c, col in enumerate(queued_columns, start=0):
+        for i, job in enumerate(col, start=1):
+          self.queued_job_sprites.append(
+            pyglet.sprite.Sprite(img=instrument_icons[job[1].instrument], 
+                                x=20 + (c * JOB_COLUMN_WIDTH), 
+                                y=(self.queued_section.sprite_box_top - (i * (JOB_V_SPACE))),
+                                batch=self.job_icon_sprite_batch))
+          self.job_text_labels.append(pyglet.text.Label(job[1].serial, font_name='Impact',
+                                    font_size=JOB_FONT_SIZE, 
+                                    x=100 + 40 + 20 + (c * JOB_COLUMN_WIDTH), 
+                                    y=(self.queued_section.sprite_box_top - (i * (JOB_V_SPACE))),
+                                    color=(0,0,0),
+                                    batch=self.job_text_labels_batch))
     with delivering_job_lock:
       if delivering_job:
         self.delivering_job_sprite = pyglet.sprite.Sprite(img=instrument_icons[delivering_job.instrument], 
@@ -236,28 +240,6 @@ def print_table():
     console.print(table)
     console.bell()
 
-def print_job_summary():
-    global queued_jobs
-    global delivering_job
-    global processing_jobs
-    global done_jobs
-    global queued_jobs_lock
-    global delivering_job_lock
-    global processing_jobs_lock
-    global done_jobs_lock
-    print(f"Job summary at {dt.datetime.now().strftime("%H:%M:%S %f")}")
-    print("queued_jobs:")
-    with queued_jobs_lock:
-      print(queued_jobs)
-    with delivering_job_lock:
-      print(f"delivering_job {delivering_job}")
-    print("processing_jobs")  
-    with processing_jobs_lock:  
-      print(processing_jobs)
-    print("done_jobs")
-    with done_jobs_lock:
-      print(done_jobs)
-
 def handle_client(conn, addr):
     global queued_jobs
     global delivering_job
@@ -316,11 +298,10 @@ def handle_client(conn, addr):
 
 
 def server_program():
-    host = '192.168.125.202' # Loopback address for local testing
-    #host = '' # Loopback address for local testing
+    host = '192.168.125.202' # address on robot network
+    #host = '' # host on all IP addresses available
     #host = '127.0.0.1' # Loopback address for local testing
     port = 65432
-
     
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM) # IPV4 TCP Socket
     server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1) # allow port reuse
