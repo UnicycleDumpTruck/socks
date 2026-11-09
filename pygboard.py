@@ -117,10 +117,11 @@ class RobotStatusWindow(pyglet.window.Window):
                               #anchor_x=0,
                               #anchor_y=JOB_ICON_HEIGHT,
                               batch=self.job_icon_sprite_batch))
-        self.text_labels.append(pyglet.text.Label(job[1].serial, font_name='Impact',
+        self.job_text_labels.append(pyglet.text.Label(job[1].serial, font_name='Impact',
                                    font_size=JOB_FONT_SIZE, 
-                                   x=self.x + 100 + 20, 
-                                   y=(self.queued_section.sprite_box_top - (i * (JOB_V_SPACE))), 
+                                   x=100 + 40 + 20, 
+                                   y=(self.queued_section.sprite_box_top - (i * (JOB_V_SPACE))),
+                                   color=(0,0,0),
                                    batch=self.job_text_labels_batch))
     with delivering_job_lock:
       if delivering_job:
@@ -128,6 +129,12 @@ class RobotStatusWindow(pyglet.window.Window):
                               x=40, 
                               y=(self.delivering_section.sprite_box_top - (JOB_V_SPACE)),
                               batch=self.job_icon_sprite_batch)
+        self.job_text_labels.append(pyglet.text.Label(delivering_job.serial, font_name='Impact',
+                                   font_size=JOB_FONT_SIZE, 
+                                   x=100 + 40 + 20, 
+                                   y=(self.delivering_section.sprite_box_top - JOB_V_SPACE),
+                                   color=(0,0,0),
+                                   batch=self.job_text_labels_batch))
     with processing_jobs_lock:
       for i, job in enumerate(processing_jobs.items(), start=1):
           self.processing_job_sprites.append(
@@ -135,6 +142,12 @@ class RobotStatusWindow(pyglet.window.Window):
                               x=40, 
                               y=(self.processing_section.sprite_box_top - (i * (JOB_V_SPACE))),
                               batch=self.job_icon_sprite_batch))
+          self.job_text_labels.append(pyglet.text.Label(job[1].serial, font_name='Impact',
+                                   font_size=JOB_FONT_SIZE, 
+                                   x=100 + 40 + 20, 
+                                   y=(self.processing_section.sprite_box_top - (i * (JOB_V_SPACE))),
+                                   color=(0,0,0),
+                                   batch=self.job_text_labels_batch))
     with done_jobs_lock:
       for i, job in enumerate(done_jobs.items(), start=1):
           self.done_job_sprites.append(
@@ -143,6 +156,12 @@ class RobotStatusWindow(pyglet.window.Window):
                               y=(self.done_section.sprite_box_top - (i * (JOB_V_SPACE))),
                               batch=self.job_icon_sprite_batch))
 
+          self.job_text_labels.append(pyglet.text.Label(job[1].serial, font_name='Impact',
+                                   font_size=JOB_FONT_SIZE, 
+                                   x=100 + 40 + 20, 
+                                   y=(self.done_section.sprite_box_top - (i * (JOB_V_SPACE))),
+                                   color=(0,0,0),
+                                   batch=self.job_text_labels_batch))
   def on_draw(self):
     global new_job_received
     if new_job_received.is_set():
@@ -156,7 +175,7 @@ class RobotStatusWindow(pyglet.window.Window):
 
 
 main_window = RobotStatusWindow(config=config, caption="Robot Status", width=1080, height=1920)
-#main_window.set_fullscreen(True)
+main_window.set_fullscreen(True)
 
 console = Console()
 
