@@ -34,7 +34,7 @@ JOB_FONT_SIZE = 32 # 24px high
 JOB_ICON_Z = 0
 JOB_ICON_HEIGHT = 100
 JOB_ICON_WIDTH = 100
-JOB_V_SPACE = 120
+JOB_V_SPACE = 110
 H1_FONT_SIZE = 36 # 48px high
 H1_LABEL_HEIGHT = 48
 Q_BLOCK_TOP_Y = 1800
@@ -68,10 +68,10 @@ class StatusSectionBackground():
                                    batch=self.batch)
     self.color = color
     self.border = pyglet.shapes.Rectangle(x=self.x, y=self.y, height=self.height, width=self.width, color=self.color, batch=self.batch)
-    self.sprite_box = pyglet.shapes.Rectangle(x=self.x + 20, 
-                                              y=self.y + 20, 
-                                              height=(self.height - 40 - H1_LABEL_HEIGHT),
-                                              width=self.width - 40,
+    self.sprite_box = pyglet.shapes.Rectangle(x=self.x + 10, 
+                                              y=self.y + 10, 
+                                              height=(self.height - 20 - H1_LABEL_HEIGHT),
+                                              width=self.width - 20,
                                               color=(255,255,255),
                                               batch=self.batch
                                               )
