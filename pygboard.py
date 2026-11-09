@@ -58,6 +58,7 @@ class StatusSectionBackground():
     self.y = y
     self.width = width
     self.height = height
+    self.sprite_box_top = (self.y + self.height) - H1_LABEL_HEIGHT
     self.batch = pyglet.graphics.Batch()
     self.label = pyglet.text.Label(label_text, font_name='Impact',
                                    font_size=H1_FONT_SIZE, 
@@ -72,16 +73,21 @@ class StatusSectionBackground():
 class RobotStatusWindow(pyglet.window.Window):
   def __init__(self, **kwargs):
     super().__init__(**kwargs)
-    self.sections = [StatusSectionBackground(x=0,y=1000,width=1080,height=920,label_text='Queued Jobs Section',color=(255,55,55)),]
+    self.queued_section = StatusSectionBackground(x=0,y=1000,width=1080,height=920,label_text='Queued Jobs',color=(255,80,80)),
+    self.delivering_section = StatusSectionBackground(x=0,y=800,width=1080,height=200,label_text='Delivering Job',color=(0,255,0)),
+    self.processing_section = StatusSectionBackground(x=0,y=400,width=1080,height=400,label_text='Processing Jobs',color=(0,0,255)),
+    self.done_section = StatusSectionBackground(x=0,y=0,width=1080,height=400,label_text='Recently Completed Jobs',color=(128,128,128)),
+    self.sections = [self.queued_section, self.delivering_section, self.processing_section, self.done_section]
+    
     # self.queued_label = pyglet.text.Label('Queued Jobs', font_name='Impact',
     #                       font_size=36, x=H1_LABEL_X, y=Q_BLOCK_TOP_Y)
-    self.delivering_label = pyglet.text.Label('Delivering Job', font_name='Impact',
-                          font_size=36, x=H1_LABEL_X, y=R_BLOCK_TOP_Y)
-    self.processing_label = pyglet.text.Label('Processing Jobs', font_name='Impact',
-                          font_size=36, x=H1_LABEL_X, y=P_BLOCK_TOP_Y)
-    self.done_label = pyglet.text.Label('Done Jobs', font_name='Impact',
-                          font_size=36, x=H1_LABEL_X, y=D_BLOCK_TOP_Y)
-    self.labels = [self.delivering_label, self.processing_label, self.done_label, self.done_label]
+    # self.delivering_label = pyglet.text.Label('Delivering Job', font_name='Impact',
+    #                       font_size=36, x=H1_LABEL_X, y=R_BLOCK_TOP_Y)
+    # self.processing_label = pyglet.text.Label('Processing Jobs', font_name='Impact',
+    #                       font_size=36, x=H1_LABEL_X, y=P_BLOCK_TOP_Y)
+    # self.done_label = pyglet.text.Label('Done Jobs', font_name='Impact',
+    #                       font_size=36, x=H1_LABEL_X, y=D_BLOCK_TOP_Y)
+    # self.labels = [self.delivering_label, self.processing_label, self.done_label, self.done_label]
        
     self.queued_job_sprites = []
     self.delivering_job_sprite = None
@@ -105,27 +111,27 @@ class RobotStatusWindow(pyglet.window.Window):
         self.queued_job_sprites.append(
           pyglet.sprite.Sprite(img=instrument_icons[job[1].instrument], 
                               x=JOB_ICON_X, 
-                              y=(Q_BLOCK_TOP_Y - H1_LABEL_HEIGHT - (i * (JOB_ICON_HEIGHT + JOB_V_SPACE))),
+                              y=(self.queued_section.sprite_box_top - (i * (JOB_ICON_HEIGHT + JOB_V_SPACE))),
                               batch=self.job_icon_sprite_batch))
     with delivering_job_lock:
       if delivering_job:
         self.delivering_job_sprite = pyglet.sprite.Sprite(img=instrument_icons[delivering_job.instrument], 
                               x=JOB_ICON_X, 
-                              y=(R_BLOCK_TOP_Y - H1_LABEL_HEIGHT - (JOB_ICON_HEIGHT + JOB_V_SPACE)),
+                              y=(self.delivering_section.sprite_box_top - (JOB_ICON_HEIGHT + JOB_V_SPACE)),
                               batch=self.job_icon_sprite_batch)
     with processing_jobs_lock:
       for i, job in enumerate(processing_jobs.items()):
           self.processing_job_sprites.append(
             pyglet.sprite.Sprite(img=instrument_icons[job[1].instrument], 
                               x=JOB_ICON_X, 
-                              y=(P_BLOCK_TOP_Y - H1_LABEL_HEIGHT - (i * (JOB_ICON_HEIGHT + JOB_V_SPACE))),
+                              y=(self.processing_section.sprite_box_top - (i * (JOB_ICON_HEIGHT + JOB_V_SPACE))),
                               batch=self.job_icon_sprite_batch))
     with done_jobs_lock:
       for i, job in enumerate(done_jobs.items()):
           self.done_job_sprites.append(
             pyglet.sprite.Sprite(img=instrument_icons[job[1].instrument], 
                               x=JOB_ICON_X, 
-                              y=(D_BLOCK_TOP_Y - H1_LABEL_HEIGHT - (i * (JOB_ICON_HEIGHT + JOB_V_SPACE))),
+                              y=(self.done_section.sprite_box_top - (i * (JOB_ICON_HEIGHT + JOB_V_SPACE))),
                               batch=self.job_icon_sprite_batch))
 
   def on_draw(self):
@@ -136,8 +142,8 @@ class RobotStatusWindow(pyglet.window.Window):
     self.clear()
     for section in self.sections:
       section.draw()
-    for lbl in self.labels:
-      lbl.draw()
+    # for lbl in self.labels:
+    #   lbl.draw()
     self.job_icon_sprite_batch.draw()
 
 
