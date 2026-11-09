@@ -113,15 +113,15 @@ class RobotStatusWindow(pyglet.window.Window):
     self.job_text_labels_batch = pyglet.graphics.Batch()
     
     with queued_jobs_lock:
-      queued_columns = list_to_col(queued_jobs.items(), 3)
+      queued_columns = list_to_col(list(queued_jobs.values()), 3)
       for c, col in enumerate(queued_columns, start=0):
         for i, job in enumerate(col, start=1):
           self.queued_job_sprites.append(
-            pyglet.sprite.Sprite(img=instrument_icons[job[1].instrument], 
+            pyglet.sprite.Sprite(img=instrument_icons[job.instrument], 
                                 x=20 + (c * JOB_COLUMN_WIDTH), 
                                 y=(self.queued_section.sprite_box_top - (i * (JOB_V_SPACE))),
                                 batch=self.job_icon_sprite_batch))
-          self.job_text_labels.append(pyglet.text.Label(job[1].serial, font_name='Impact',
+          self.job_text_labels.append(pyglet.text.Label(job.serial, font_name='Impact',
                                     font_size=JOB_FONT_SIZE, 
                                     x=100 + 40 + 20 + (c * JOB_COLUMN_WIDTH), 
                                     y=(self.queued_section.sprite_box_top - (i * (JOB_V_SPACE))),
@@ -130,7 +130,7 @@ class RobotStatusWindow(pyglet.window.Window):
     with delivering_job_lock:
       if delivering_job:
         self.delivering_job_sprite = pyglet.sprite.Sprite(img=instrument_icons[delivering_job.instrument], 
-                              x=40, 
+                              x=20, 
                               y=(self.delivering_section.sprite_box_top - (JOB_V_SPACE)),
                               batch=self.job_icon_sprite_batch)
         self.job_text_labels.append(pyglet.text.Label(delivering_job.serial, font_name='Impact',
@@ -140,29 +140,33 @@ class RobotStatusWindow(pyglet.window.Window):
                                    color=(0,0,0),
                                    batch=self.job_text_labels_batch))
     with processing_jobs_lock:
-      for i, job in enumerate(processing_jobs.items(), start=1):
+      processing_columns = list_to_col(list(processing_jobs.values()), 3)
+      for c, col, in enumerate(processing_columns, start=0):
+        for i, job in enumerate(col, start=1):
           self.processing_job_sprites.append(
-            pyglet.sprite.Sprite(img=instrument_icons[job[1].instrument], 
-                              x=40, 
+            pyglet.sprite.Sprite(img=instrument_icons[job.instrument], 
+                              x=20 + (c * JOB_COLUMN_WIDTH), 
                               y=(self.processing_section.sprite_box_top - (i * (JOB_V_SPACE))),
                               batch=self.job_icon_sprite_batch))
-          self.job_text_labels.append(pyglet.text.Label(job[1].serial, font_name='Impact',
+          self.job_text_labels.append(pyglet.text.Label(job.serial, font_name='Impact',
                                    font_size=JOB_FONT_SIZE, 
-                                   x=100 + 40 + 20, 
+                                   x=100 + 40 + 20 + (c * JOB_COLUMN_WIDTH), 
                                    y=(self.processing_section.sprite_box_top - (i * (JOB_V_SPACE))),
                                    color=(0,0,0),
                                    batch=self.job_text_labels_batch))
     with done_jobs_lock:
-      for i, job in enumerate(done_jobs.items(), start=1):
+      done_columns = list_to_col(list(done_jobs.values()), 3)
+      for c, col in enumerate(done_columns, start=0):
+        for i, job in enumerate(col, start=1):
           self.done_job_sprites.append(
-            pyglet.sprite.Sprite(img=instrument_icons[job[1].instrument], 
-                              x=40, 
+            pyglet.sprite.Sprite(img=instrument_icons[job.instrument], 
+                              x=20 + (c * JOB_COLUMN_WIDTH), 
                               y=(self.done_section.sprite_box_top - (i * (JOB_V_SPACE))),
                               batch=self.job_icon_sprite_batch))
 
-          self.job_text_labels.append(pyglet.text.Label(job[1].serial, font_name='Impact',
+          self.job_text_labels.append(pyglet.text.Label(job.serial, font_name='Impact',
                                    font_size=JOB_FONT_SIZE, 
-                                   x=100 + 40 + 20, 
+                                   x=100 + 40 + 20 + (c * JOB_COLUMN_WIDTH), 
                                    y=(self.done_section.sprite_box_top - (i * (JOB_V_SPACE))),
                                    color=(0,0,0),
                                    batch=self.job_text_labels_batch))
@@ -235,7 +239,7 @@ def print_table():
         print(f"adding to done: {job[1].str()}")
         done_table.add_row(job[1].str())
     done_table.add_row("")
-    console.clear() # Wipe the console of the last-drawn table
+#    console.clear() # Wipe the console of the last-drawn table
     print("\n\n")
     console.print(table)
     console.bell()
