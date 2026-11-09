@@ -36,8 +36,8 @@ JOB_V_SPACE = 20
 H1_LABEL_HEIGHT = 40
 Q_BLOCK_TOP_Y = 1800
 R_BLOCK_TOP_Y = 1000
-P_BLOCK_TOP_Y = 900
-D_BLOCK_TOP_Y = 700
+P_BLOCK_TOP_Y = 800
+D_BLOCK_TOP_Y = 400
 
 agitator_icon = pyglet.image.load('agi_100.png')
 formulator_icon = pyglet.image.load('for_100.png')
@@ -64,6 +64,7 @@ class RobotStatusWindow(pyglet.window.Window):
     self.labels = [self.queued_label, self.delivering_label, self.processing_label, self.done_label, self.done_label]
     print('Main status window init complete')
   def update_lists(self):
+    print("Updating lists")
     queued_job_sprites = []
     delivering_job_sprite = None
     processing_job_sprites = []
@@ -76,41 +77,35 @@ class RobotStatusWindow(pyglet.window.Window):
           pyglet.sprite.Sprite(img=instrument_icons[job[1].instrument], 
                               x=JOB_ICON_X, 
                               y=(Q_BLOCK_TOP_Y - H1_LABEL_HEIGHT - (i * (JOB_ICON_HEIGHT + JOB_V_SPACE))),
-                              #width=JOB_ICON_WIDTH,
-                              #HEIGHT=JOB_ICON_HEIGHT,
                               batch=job_icon_sprite_batch))
         print(f"adding to queued: {job[1].str()}")
+        print(queued_job_sprites)
     with delivering_job_lock:
       if delivering_job:
         print(f"adding to delivering: {delivering_job.str()}")
-        delivering_job_sprite = pyglet.sprite.Sprite(img=instrument_icons[job[1].instrument], 
+        delivering_job_sprite = pyglet.sprite.Sprite(img=instrument_icons[delivering_job.instrument], 
                               x=JOB_ICON_X, 
-                              y=(Q_BLOCK_TOP_Y - H1_LABEL_HEIGHT - (i * (JOB_ICON_HEIGHT + JOB_V_SPACE))),
-                              #width=JOB_ICON_WIDTH,
-                              #HEIGHT=JOB_ICON_HEIGHT,
+                              y=(R_BLOCK_TOP_Y - H1_LABEL_HEIGHT - (JOB_ICON_HEIGHT + JOB_V_SPACE)),
                               batch=job_icon_sprite_batch)
+        print("delivering_job_sprite x: ", delivering_job_sprite.x, "y: ", delivering_job_sprite.y)
     with processing_jobs_lock:
       for i, job in enumerate(processing_jobs.items()):
           processing_job_sprites.append(
             pyglet.sprite.Sprite(img=instrument_icons[job[1].instrument], 
                               x=JOB_ICON_X, 
-                              y=(Q_BLOCK_TOP_Y - H1_LABEL_HEIGHT - (i * (JOB_ICON_HEIGHT + JOB_V_SPACE))),
-                              #width=JOB_ICON_WIDTH,
-                              #HEIGHT=JOB_ICON_HEIGHT,
+                              y=(P_BLOCK_TOP_Y - H1_LABEL_HEIGHT - (i * (JOB_ICON_HEIGHT + JOB_V_SPACE))),
                               batch=job_icon_sprite_batch))
-
           print(f"adding to proc: {job[1].str()}")
+          print(processing_job_sprites)
     with done_jobs_lock:
       for i, job in enumerate(done_jobs.items()):
           done_job_sprites.append(
           pyglet.sprite.Sprite(img=instrument_icons[job[1].instrument], 
                               x=JOB_ICON_X, 
-                              y=(Q_BLOCK_TOP_Y - H1_LABEL_HEIGHT - (i * (JOB_ICON_HEIGHT + JOB_V_SPACE))),
-                              #width=JOB_ICON_WIDTH,
-                              #HEIGHT=JOB_ICON_HEIGHT,
+                              y=(D_BLOCK_TOP_Y - H1_LABEL_HEIGHT - (i * (JOB_ICON_HEIGHT + JOB_V_SPACE))),
                               batch=job_icon_sprite_batch))
-  
-        print(f"adding to done: {job[1].str()}")
+          print(f"adding to done: {job[1].str()}")
+          print(done_job_sprites)
 
   def on_draw(self):
     global new_job_received
@@ -120,8 +115,14 @@ class RobotStatusWindow(pyglet.window.Window):
     self.clear()
     for lbl in self.labels:
       lbl.draw()
+    test_sprite = pyglet.sprite.Sprite(img=formulator_icon, 
+                                       x=JOB_ICON_X, 
+                                       y=(Q_BLOCK_TOP_Y - H1_LABEL_HEIGHT), 
+                                       batch=job_icon_sprite_batch)
     job_icon_sprite_batch.draw()
-
+    if delivering_job_sprite:
+        delivering_job_sprite.draw()
+#    test_sprite.draw()
 
 
 main_window = RobotStatusWindow(config=config, caption="Robot Status", width=1080, height=1920)
