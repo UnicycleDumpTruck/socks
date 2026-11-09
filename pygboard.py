@@ -26,7 +26,7 @@ config = screen.get_best_config()
 config.opengl_api = "gles"
 config.major_version = 3
 config.minor_version = 1
-config.fullscreen = True
+#config.fullscreen = True
 
 H1_LABEL_X = 100
 JOB_ICON_X = 120
@@ -67,35 +67,32 @@ class StatusSectionBackground():
                                    batch=self.batch)
     self.color = color
     self.border = pyglet.shapes.Rectangle(x=self.x, y=self.y, height=self.height, width=self.width, color=self.color, batch=self.batch)
+    self.sprite_box = pyglet.shapes.Rectangle(x=self.x + 20, 
+                                              y=self.y + 20, 
+                                              height=(self.height - 40 - H1_LABEL_HEIGHT),
+                                              width=self.width - 40,
+                                              color=(255,255,255),
+                                              batch=self.batch
+                                              )
   def draw(self):
     self.batch.draw()
 
 class RobotStatusWindow(pyglet.window.Window):
   def __init__(self, **kwargs):
     super().__init__(**kwargs)
-    self.queued_section = StatusSectionBackground(x=0,y=1000,width=1080,height=920,label_text='Queued Jobs',color=(255,80,80)),
-    self.delivering_section = StatusSectionBackground(x=0,y=800,width=1080,height=200,label_text='Delivering Job',color=(0,255,0)),
-    self.processing_section = StatusSectionBackground(x=0,y=400,width=1080,height=400,label_text='Processing Jobs',color=(0,0,255)),
-    self.done_section = StatusSectionBackground(x=0,y=0,width=1080,height=400,label_text='Recently Completed Jobs',color=(128,128,128)),
+    self.queued_section = StatusSectionBackground(x=0,y=1000,width=1080,height=920,label_text='Queued Jobs',color=(255,80,80))
+    self.delivering_section = StatusSectionBackground(x=0,y=800,width=1080,height=200,label_text='Delivering Job',color=(0,255,0))
+    self.processing_section = StatusSectionBackground(x=0,y=400,width=1080,height=400,label_text='Processing Jobs',color=(0,0,255))
+    self.done_section = StatusSectionBackground(x=0,y=0,width=1080,height=400,label_text='Recently Completed Jobs',color=(128,128,128))
     self.sections = [self.queued_section, self.delivering_section, self.processing_section, self.done_section]
     
-    # self.queued_label = pyglet.text.Label('Queued Jobs', font_name='Impact',
-    #                       font_size=36, x=H1_LABEL_X, y=Q_BLOCK_TOP_Y)
-    # self.delivering_label = pyglet.text.Label('Delivering Job', font_name='Impact',
-    #                       font_size=36, x=H1_LABEL_X, y=R_BLOCK_TOP_Y)
-    # self.processing_label = pyglet.text.Label('Processing Jobs', font_name='Impact',
-    #                       font_size=36, x=H1_LABEL_X, y=P_BLOCK_TOP_Y)
-    # self.done_label = pyglet.text.Label('Done Jobs', font_name='Impact',
-    #                       font_size=36, x=H1_LABEL_X, y=D_BLOCK_TOP_Y)
-    # self.labels = [self.delivering_label, self.processing_label, self.done_label, self.done_label]
-       
     self.queued_job_sprites = []
     self.delivering_job_sprite = None
     self.processing_job_sprites = []
     self.done_job_sprites = []
     self.job_icon_sprite_batch = pyglet.graphics.Batch()
+    self.job_text_labels_batch = pyglet.graphics.Batch()
 
-    print('Main status window init complete')
   def update_lists(self):
     print("Updating lists")
 
@@ -111,7 +108,9 @@ class RobotStatusWindow(pyglet.window.Window):
         self.queued_job_sprites.append(
           pyglet.sprite.Sprite(img=instrument_icons[job[1].instrument], 
                               x=JOB_ICON_X, 
-                              y=(self.queued_section.sprite_box_top - (i * (JOB_ICON_HEIGHT + JOB_V_SPACE))),
+                              y=(self.queued_section.sprite_box_top - ((i+1) * (JOB_ICON_HEIGHT + JOB_V_SPACE))),
+                              #anchor_x=0,
+                              #anchor_y=JOB_ICON_HEIGHT,
                               batch=self.job_icon_sprite_batch))
     with delivering_job_lock:
       if delivering_job:
@@ -124,14 +123,14 @@ class RobotStatusWindow(pyglet.window.Window):
           self.processing_job_sprites.append(
             pyglet.sprite.Sprite(img=instrument_icons[job[1].instrument], 
                               x=JOB_ICON_X, 
-                              y=(self.processing_section.sprite_box_top - (i * (JOB_ICON_HEIGHT + JOB_V_SPACE))),
+                              y=(self.processing_section.sprite_box_top - ((i+1) * (JOB_ICON_HEIGHT + JOB_V_SPACE))),
                               batch=self.job_icon_sprite_batch))
     with done_jobs_lock:
       for i, job in enumerate(done_jobs.items()):
           self.done_job_sprites.append(
             pyglet.sprite.Sprite(img=instrument_icons[job[1].instrument], 
                               x=JOB_ICON_X, 
-                              y=(self.done_section.sprite_box_top - (i * (JOB_ICON_HEIGHT + JOB_V_SPACE))),
+                              y=(self.done_section.sprite_box_top - ((i+1) * (JOB_ICON_HEIGHT + JOB_V_SPACE))),
                               batch=self.job_icon_sprite_batch))
 
   def on_draw(self):
@@ -142,13 +141,11 @@ class RobotStatusWindow(pyglet.window.Window):
     self.clear()
     for section in self.sections:
       section.draw()
-    # for lbl in self.labels:
-    #   lbl.draw()
     self.job_icon_sprite_batch.draw()
 
 
 main_window = RobotStatusWindow(config=config, caption="Robot Status", width=1080, height=1920)
-main_window.set_fullscreen(True)
+#main_window.set_fullscreen(True)
 
 console = Console()
 
