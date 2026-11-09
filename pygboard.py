@@ -26,6 +26,7 @@ config = screen.get_best_config()
 config.opengl_api = "gles"
 config.major_version = 3
 config.minor_version = 1
+config.fullscreen = True
 
 H1_LABEL_X = 100
 JOB_ICON_X = 120
@@ -57,11 +58,14 @@ class StatusSectionBackground():
     self.y = y
     self.width = width
     self.height = height
-    self.label = pyglet.text.Label(label_text, font_name='Impact',
-                          font_size=H1_FONT_SIZE, x=self.x + 20, y=(self.y - H1_LABEL_HEIGHT), batch=self.batch)
-    self.color = color
     self.batch = pyglet.graphics.Batch()
-    self.border = pyglet.shapes.Rectangle(x=self.x, y=self.y, height=self.height, color=self.color, batch=self.batch)
+    self.label = pyglet.text.Label(label_text, font_name='Impact',
+                                   font_size=H1_FONT_SIZE, 
+                                   x=self.x + 20, 
+                                   y=((self.y + self.height) - H1_LABEL_HEIGHT), 
+                                   batch=self.batch)
+    self.color = color
+    self.border = pyglet.shapes.Rectangle(x=self.x, y=self.y, height=self.height, width=self.width, color=self.color, batch=self.batch)
   def draw(self):
     self.batch.draw()
 
@@ -77,7 +81,7 @@ class RobotStatusWindow(pyglet.window.Window):
                           font_size=36, x=H1_LABEL_X, y=P_BLOCK_TOP_Y)
     self.done_label = pyglet.text.Label('Done Jobs', font_name='Impact',
                           font_size=36, x=H1_LABEL_X, y=D_BLOCK_TOP_Y)
-    self.labels = [self.queued_label, self.delivering_label, self.processing_label, self.done_label, self.done_label]
+    self.labels = [self.delivering_label, self.processing_label, self.done_label, self.done_label]
        
     self.queued_job_sprites = []
     self.delivering_job_sprite = None
@@ -138,6 +142,7 @@ class RobotStatusWindow(pyglet.window.Window):
 
 
 main_window = RobotStatusWindow(config=config, caption="Robot Status", width=1080, height=1920)
+main_window.set_fullscreen(True)
 
 console = Console()
 
