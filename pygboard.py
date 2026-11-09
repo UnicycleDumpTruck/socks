@@ -1,13 +1,13 @@
 #!/usr/bin/python3
 
-import pyglet
-import random
 import datetime as dt
 import socket
 import threading
-import pprint
+
+import pyglet
 from rich.console import Console
 from rich.table import Table
+
 from job import Job
 
 # Job contains serial, instrument, ball_count, balls[4], attr_count, attrs[4], seconds_done, status
@@ -266,7 +266,7 @@ class RobotStatusWindow(pyglet.window.Window):
                     )
 
     def on_draw(self):
-        global new_job_received
+        # global new_job_received
         if new_job_received.is_set():
             self.update_lists()
             new_job_received.clear()
@@ -300,14 +300,14 @@ new_job_received = threading.Event()
 
 
 def print_table():
-    global queued_jobs
-    global delivering_job
-    global processing_jobs
-    global done_jobs
-    global queued_jobs_lock
-    global delivering_job_lock
-    global processing_jobs_lock
-    global done_jobs_lock
+    # global queued_jobs
+    # global delivering_job
+    # global processing_jobs
+    # global done_jobs
+    # global queued_jobs_lock
+    # global delivering_job_lock
+    # global processing_jobs_lock
+    # global done_jobs_lock
 
     # Build table for terminal display
     table = Table(f"Robot Job Status at {dt.datetime.now().strftime('%H:%M:%S %f')}")
@@ -348,15 +348,15 @@ def print_table():
 
 
 def handle_client(conn, addr):
-    global queued_jobs
+    # global queued_jobs
     global delivering_job
-    global processing_jobs
-    global done_jobs
-    global queued_jobs_lock
-    global delivering_job_lock
-    global processing_jobs_lock
-    global done_jobs_lock
-    global new_job_received
+    # global processing_jobs
+    # global done_jobs
+    # global queued_jobs_lock
+    # global delivering_job_lock
+    # global processing_jobs_lock
+    # global done_jobs_lock
+    # global new_job_received
 
     with lock:
         client_list.append(addr)
