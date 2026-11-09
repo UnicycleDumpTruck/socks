@@ -53,10 +53,14 @@ job_icon_sprite_batch = pyglet.graphics.Batch()
 class RobotStatusWindow(pyglet.window.Window):
   def __init__(self, **kwargs):
     super().__init__(**kwargs)
-    self.queued_label = pyglet.text.Label('Queued Jobs', x=H1_LABEL_X, y=Q_BLOCK_TOP_Y)
-    self.delivering_label = pyglet.text.Label('Delivering Job', x=H1_LABEL_X, y=R_BLOCK_TOP_Y)
-    self.processing_label = pyglet.text.Label('Processing Jobs', x=H1_LABEL_X, y=P_BLOCK_TOP_Y)
-    self.done_label = pyglet.text.Label('Done Jobs', x=H1_LABEL_X, y=D_BLOCK_TOP_Y)
+    self.queued_label = pyglet.text.Label('Queued Jobs', font_name='Impact',
+                          font_size=36, x=H1_LABEL_X, y=Q_BLOCK_TOP_Y)
+    self.delivering_label = pyglet.text.Label('Delivering Job', font_name='Impact',
+                          font_size=36, x=H1_LABEL_X, y=R_BLOCK_TOP_Y)
+    self.processing_label = pyglet.text.Label('Processing Jobs', font_name='Impact',
+                          font_size=36, x=H1_LABEL_X, y=P_BLOCK_TOP_Y)
+    self.done_label = pyglet.text.Label('Done Jobs', font_name='Impact',
+                          font_size=36, x=H1_LABEL_X, y=D_BLOCK_TOP_Y)
     self.labels = [self.queued_label, self.delivering_label, self.processing_label, self.done_label, self.done_label]
     print('Main status window init complete')
   def update_lists(self):
@@ -109,6 +113,10 @@ class RobotStatusWindow(pyglet.window.Window):
         print(f"adding to done: {job[1].str()}")
 
   def on_draw(self):
+    global new_job_received
+    if new_job_received.is_set():
+      self.update_lists()
+      new_job_received.clear()
     self.clear()
     for lbl in self.labels:
       lbl.draw()
@@ -117,22 +125,6 @@ class RobotStatusWindow(pyglet.window.Window):
 
 
 main_window = RobotStatusWindow(config=config, caption="Robot Status", width=1080, height=1920)
-
-label = pyglet.text.Label('Hello world',
-                          font_name='Times New Roman',
-                          font_size=36,
-                          x=main_window.width//2, y=main_window.height//2,
-                          anchor_x='center', anchor_y='center')
-
-#@main_window.event
-#def on_draw():
-#    main_window.clear()
-#    label.draw()
-
-
-
-
-
 
 console = Console()
 
@@ -148,6 +140,7 @@ queued_jobs_lock = threading.Lock()
 delivering_job_lock = threading.Lock()
 processing_jobs_lock = threading.Lock()
 done_jobs_lock = threading.Lock()
+new_job_received = threading.Event()
 
 def print_table():
     global queued_jobs
@@ -223,6 +216,7 @@ def handle_client(conn, addr):
     global delivering_job_lock
     global processing_jobs_lock
     global done_jobs_lock
+    global new_job_received
 
     with lock:
         client_list.append(addr)
@@ -263,6 +257,7 @@ def handle_client(conn, addr):
                     with done_jobs_lock:
                       done_jobs[rx_job.serial] = rx_job
                 print_table()
+                new_job_received.set()
     except (ConnectionResetError, BrokenPipeError) as e:
         print (f"Connection error with {addr}: {e}")
     finally:
