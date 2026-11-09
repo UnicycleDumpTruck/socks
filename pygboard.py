@@ -33,7 +33,8 @@ JOB_ICON_Z = 0
 JOB_ICON_HEIGHT = 100
 JOB_ICON_WIDTH = 100
 JOB_V_SPACE = 20
-H1_LABEL_HEIGHT = 40
+H1_FONT_SIZE = 36
+H1_LABEL_HEIGHT = 48
 Q_BLOCK_TOP_Y = 1800
 R_BLOCK_TOP_Y = 1000
 P_BLOCK_TOP_Y = 800
@@ -50,11 +51,26 @@ processing_job_sprites = []
 done_job_sprites = []
 job_icon_sprite_batch = pyglet.graphics.Batch()
 
+class StatusSectionBackground():
+  def __init__(self, x, y, width, height, label_text, color): # color should be RGB tuple like (55, 55, 255)
+    self.x = x
+    self.y = y
+    self.width = width
+    self.height = height
+    self.label = pyglet.text.Label(label_text, font_name='Impact',
+                          font_size=H1_FONT_SIZE, x=self.x + 20, y=(self.y - H1_LABEL_HEIGHT), batch=self.batch)
+    self.color = color
+    self.batch = pyglet.graphics.Batch()
+    self.border = pyglet.shapes.Rectangle(x=self.x, y=self.y, height=self.height, color=self.color, batch=self.batch)
+  def draw(self):
+    self.batch.draw()
+
 class RobotStatusWindow(pyglet.window.Window):
   def __init__(self, **kwargs):
     super().__init__(**kwargs)
-    self.queued_label = pyglet.text.Label('Queued Jobs', font_name='Impact',
-                          font_size=36, x=H1_LABEL_X, y=Q_BLOCK_TOP_Y)
+    self.sections = [StatusSectionBackground(x=0,y=1000,width=1080,height=920,label_text='Queued Jobs Section',color=(255,55,55)),]
+    # self.queued_label = pyglet.text.Label('Queued Jobs', font_name='Impact',
+    #                       font_size=36, x=H1_LABEL_X, y=Q_BLOCK_TOP_Y)
     self.delivering_label = pyglet.text.Label('Delivering Job', font_name='Impact',
                           font_size=36, x=H1_LABEL_X, y=R_BLOCK_TOP_Y)
     self.processing_label = pyglet.text.Label('Processing Jobs', font_name='Impact',
@@ -114,6 +130,8 @@ class RobotStatusWindow(pyglet.window.Window):
       self.update_lists()
       new_job_received.clear()
     self.clear()
+    for section in self.sections:
+      section.draw()
     for lbl in self.labels:
       lbl.draw()
     self.job_icon_sprite_batch.draw()
