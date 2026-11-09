@@ -86,35 +86,27 @@ class RobotStatusWindow(pyglet.window.Window):
           pyglet.sprite.Sprite(img=instrument_icons[job[1].instrument], 
                               x=JOB_ICON_X, 
                               y=(Q_BLOCK_TOP_Y - H1_LABEL_HEIGHT - (i * (JOB_ICON_HEIGHT + JOB_V_SPACE))),
-                              batch=job_icon_sprite_batch))
-        print(f"adding to queued: {job[1].str()}")
-        print(queued_job_sprites)
+                              batch=self.job_icon_sprite_batch))
     with delivering_job_lock:
       if delivering_job:
-        print(f"adding to delivering: {delivering_job.str()}")
         self.delivering_job_sprite = pyglet.sprite.Sprite(img=instrument_icons[delivering_job.instrument], 
                               x=JOB_ICON_X, 
                               y=(R_BLOCK_TOP_Y - H1_LABEL_HEIGHT - (JOB_ICON_HEIGHT + JOB_V_SPACE)),
-                              batch=job_icon_sprite_batch)
-        print("delivering_job_sprite x: ", delivering_job_sprite.x, "y: ", delivering_job_sprite.y)
+                              batch=self.job_icon_sprite_batch)
     with processing_jobs_lock:
       for i, job in enumerate(processing_jobs.items()):
           self.processing_job_sprites.append(
             pyglet.sprite.Sprite(img=instrument_icons[job[1].instrument], 
                               x=JOB_ICON_X, 
                               y=(P_BLOCK_TOP_Y - H1_LABEL_HEIGHT - (i * (JOB_ICON_HEIGHT + JOB_V_SPACE))),
-                              batch=job_icon_sprite_batch))
-          print(f"adding to proc: {job[1].str()}")
-          print(processing_job_sprites)
+                              batch=self.job_icon_sprite_batch))
     with done_jobs_lock:
       for i, job in enumerate(done_jobs.items()):
           self.done_job_sprites.append(
             pyglet.sprite.Sprite(img=instrument_icons[job[1].instrument], 
                               x=JOB_ICON_X, 
                               y=(D_BLOCK_TOP_Y - H1_LABEL_HEIGHT - (i * (JOB_ICON_HEIGHT + JOB_V_SPACE))),
-                              batch=job_icon_sprite_batch))
-          print(f"adding to done: {job[1].str()}")
-          print(done_job_sprites)
+                              batch=self.job_icon_sprite_batch))
 
   def on_draw(self):
     global new_job_received
@@ -124,14 +116,7 @@ class RobotStatusWindow(pyglet.window.Window):
     self.clear()
     for lbl in self.labels:
       lbl.draw()
-    # test_sprite = pyglet.sprite.Sprite(img=formulator_icon, 
-    #                                    x=JOB_ICON_X, 
-    #                                    y=(Q_BLOCK_TOP_Y - H1_LABEL_HEIGHT), 
-    #                                    batch=job_icon_sprite_batch)
     self.job_icon_sprite_batch.draw()
-    # if delivering_job_sprite:
-    #     delivering_job_sprite.draw()
-#    test_sprite.draw()
 
 
 main_window = RobotStatusWindow(config=config, caption="Robot Status", width=1080, height=1920)
