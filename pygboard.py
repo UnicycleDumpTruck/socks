@@ -62,18 +62,27 @@ class RobotStatusWindow(pyglet.window.Window):
     self.done_label = pyglet.text.Label('Done Jobs', font_name='Impact',
                           font_size=36, x=H1_LABEL_X, y=D_BLOCK_TOP_Y)
     self.labels = [self.queued_label, self.delivering_label, self.processing_label, self.done_label, self.done_label]
+       
+    self.queued_job_sprites = []
+    self.delivering_job_sprite = None
+    self.processing_job_sprites = []
+    self.done_job_sprites = []
+    self.job_icon_sprite_batch = pyglet.graphics.Batch()
+
     print('Main status window init complete')
   def update_lists(self):
     print("Updating lists")
-    queued_job_sprites = []
-    delivering_job_sprite = None
-    processing_job_sprites = []
-    done_job_sprites = []
-    job_icon_sprite_batch = pyglet.graphics.Batch()
 
+    # Empty the existing data
+    self.queued_job_sprites = []
+    self.delivering_job_sprite = None
+    self.processing_job_sprites = []
+    self.done_job_sprites = []
+    self.job_icon_sprite_batch = pyglet.graphics.Batch()
+    
     with queued_jobs_lock:
       for i, job in enumerate(queued_jobs.items()):
-        queued_job_sprites.append(
+        self.queued_job_sprites.append(
           pyglet.sprite.Sprite(img=instrument_icons[job[1].instrument], 
                               x=JOB_ICON_X, 
                               y=(Q_BLOCK_TOP_Y - H1_LABEL_HEIGHT - (i * (JOB_ICON_HEIGHT + JOB_V_SPACE))),
@@ -83,14 +92,14 @@ class RobotStatusWindow(pyglet.window.Window):
     with delivering_job_lock:
       if delivering_job:
         print(f"adding to delivering: {delivering_job.str()}")
-        delivering_job_sprite = pyglet.sprite.Sprite(img=instrument_icons[delivering_job.instrument], 
+        self.delivering_job_sprite = pyglet.sprite.Sprite(img=instrument_icons[delivering_job.instrument], 
                               x=JOB_ICON_X, 
                               y=(R_BLOCK_TOP_Y - H1_LABEL_HEIGHT - (JOB_ICON_HEIGHT + JOB_V_SPACE)),
                               batch=job_icon_sprite_batch)
         print("delivering_job_sprite x: ", delivering_job_sprite.x, "y: ", delivering_job_sprite.y)
     with processing_jobs_lock:
       for i, job in enumerate(processing_jobs.items()):
-          processing_job_sprites.append(
+          self.processing_job_sprites.append(
             pyglet.sprite.Sprite(img=instrument_icons[job[1].instrument], 
                               x=JOB_ICON_X, 
                               y=(P_BLOCK_TOP_Y - H1_LABEL_HEIGHT - (i * (JOB_ICON_HEIGHT + JOB_V_SPACE))),
@@ -99,8 +108,8 @@ class RobotStatusWindow(pyglet.window.Window):
           print(processing_job_sprites)
     with done_jobs_lock:
       for i, job in enumerate(done_jobs.items()):
-          done_job_sprites.append(
-          pyglet.sprite.Sprite(img=instrument_icons[job[1].instrument], 
+          self.done_job_sprites.append(
+            pyglet.sprite.Sprite(img=instrument_icons[job[1].instrument], 
                               x=JOB_ICON_X, 
                               y=(D_BLOCK_TOP_Y - H1_LABEL_HEIGHT - (i * (JOB_ICON_HEIGHT + JOB_V_SPACE))),
                               batch=job_icon_sprite_batch))
@@ -115,13 +124,13 @@ class RobotStatusWindow(pyglet.window.Window):
     self.clear()
     for lbl in self.labels:
       lbl.draw()
-    test_sprite = pyglet.sprite.Sprite(img=formulator_icon, 
-                                       x=JOB_ICON_X, 
-                                       y=(Q_BLOCK_TOP_Y - H1_LABEL_HEIGHT), 
-                                       batch=job_icon_sprite_batch)
-    job_icon_sprite_batch.draw()
-    if delivering_job_sprite:
-        delivering_job_sprite.draw()
+    # test_sprite = pyglet.sprite.Sprite(img=formulator_icon, 
+    #                                    x=JOB_ICON_X, 
+    #                                    y=(Q_BLOCK_TOP_Y - H1_LABEL_HEIGHT), 
+    #                                    batch=job_icon_sprite_batch)
+    self.job_icon_sprite_batch.draw()
+    # if delivering_job_sprite:
+    #     delivering_job_sprite.draw()
 #    test_sprite.draw()
 
 
