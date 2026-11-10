@@ -285,7 +285,7 @@ main_window.set_fullscreen(True)
 console = Console()
 
 client_list = []
-lock = threading.Lock()
+socket_lock = threading.Lock()
 message_log = []
 
 queued_jobs = {}
@@ -358,7 +358,7 @@ def handle_client(conn, addr):
     # global done_jobs_lock
     # global new_job_received
 
-    with lock:
+    with socket_lock:
         client_list.append(addr)
     print("=" * 80)
     print(f"Connection from: {addr} at {dt.datetime.now().strftime('%H:%M:%S %f')}")
@@ -368,7 +368,7 @@ def handle_client(conn, addr):
             if not data:  # empty bytes mean the client closed the connection
                 break
             conn.sendall(data)  # echo the received data back to the clent
-            with lock:
+            with socket_lock:
                 rx_job = Job(data.decode("utf-8"))
                 print(f"Job status change received for {rx_job}")
                 if rx_job.status == "queued":
