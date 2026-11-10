@@ -42,9 +42,9 @@ R_BLOCK_TOP_Y = 1000
 P_BLOCK_TOP_Y = 800
 D_BLOCK_TOP_Y = 400
 
-agitator_icon = pyglet.image.load("agi_100.png")
-formulator_icon = pyglet.image.load("for_100.png")
-compressor_icon = pyglet.image.load("com_100.png")
+agitator_icon = pyglet.image.load("images/agi_100.png")
+formulator_icon = pyglet.image.load("images/for_100.png")
+compressor_icon = pyglet.image.load("images/com_100.png")
 instrument_icons = {"1": formulator_icon, "2": agitator_icon, "3": compressor_icon}
 
 queued_job_sprites = []
